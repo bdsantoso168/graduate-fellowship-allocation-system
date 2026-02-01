@@ -1,5 +1,6 @@
 # Graduate Fellowship Allocation System  
 **ISOM 424 – Consulting Practicum**
+<img width="2752" height="1536" alt="Graduate Fellowship Allocation System thumbnail" src="https://github.com/user-attachments/assets/f8bf98fb-0336-4909-bc1d-2df05e922599" />
 
 This repository documents a **faculty-supervised consulting engagement** focused on improving the accuracy and efficiency of a graduate fellowship allocation system for an academic institution.
 
