@@ -26,6 +26,17 @@ This repository is intentionally used for:
 ## Status
 Active consulting engagement (14-week duration).
 
+## Project Phase & Timeline
+
+The engagement has progressed from initial environment configuration into **active feature development and technical refinement**.
+
+The current phase emphasizes:
+- Improving document extraction robustness for modern resume formats
+- Increasing matching accuracy through refined scoring logic
+- Preparing the system for a stable, server-based demonstration environment
+
+The final demonstration is targeted for early May, following a February–March research and development sprint and an April stabilization window.
+
 ## Disclaimer
 This repository is for **documentation and portfolio purposes only**.  
 All sensitive implementation details remain within approved institutional systems.
