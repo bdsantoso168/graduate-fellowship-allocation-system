@@ -1,21 +1,32 @@
 # Resume Matching Benchmark
 
-This repository contains the manual resume matching benchmark used to validate the automated matching system for the ISOM 424 consulting project.
+This folder contains the manual benchmark workflow used to validate the automated matching system in the Graduate Fellowship Allocation System project.
 
-## Contents
-- `data/manual_matching_results.xlsx` — final benchmark matching table
-- `data/resume_content_preview.csv` — Python-extracted resume text preview and keywords
-- `data/degree_experience_preview.csv` — Python-extracted degree and experience helper file
-- `documentation/README_Process.docx` — detailed process documentation
+## Purpose
+The goal of this work was to create a structured manual benchmark to compare against the system-generated matching results.
 
-## Method Summary
-The workflow followed:
+## Workflow
 1. Python-based resume text extraction
-2. CSV import and structuring in Excel
-3. Degree lookup and skills-based standardization
-4. Degree-priority department classification
-5. Final matched-results benchmark for validation against the system output
+2. CSV generation for preview, keywords, degree, and experience
+3. Excel import and Power Query structuring
+4. Degree lookup and standardized experience logic
+5. Degree-priority department classification
+6. Final matched-results benchmark for validation
+
+## Files
+### data/
+- `manual_matching_results.xlsx` — final benchmark matching table
+- `resume_content_preview.csv` — extracted resume preview and keyword helper file
+- `degree_experience_preview.csv` — extracted degree and experience helper file
+
+### scripts/
+- `extract_resume_content.py` — extracts resume preview text and keywords
+- `degree_experience_preview.py` — extracts suggested degree and experience fields
+
+### documentation/
+- `README_Process.docx` — full process documentation
 
 ## Notes
-- Raw resumes are not included here.
-- This repository is intended for project documentation and validation support.
+- Raw resumes are not included in this repository.
+- Department matching uses a degree-priority rule-based logic with skills as fallback.
+- This benchmark is intended for internal validation against the automated system.
