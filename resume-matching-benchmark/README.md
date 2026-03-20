@@ -30,3 +30,9 @@ The goal of this work was to create a structured manual benchmark to compare aga
 - Raw resumes are not included in this repository.
 - Department matching uses a degree-priority rule-based logic with skills as fallback.
 - This benchmark is intended for internal validation against the automated system.
+
+## Note
+
+This repository contains an earlier benchmark and workflow for resume matching.
+
+The current Week 8 manual matching task is being redone fully based on updated team instructions requiring strictly human judgment and standardized formatting.
