@@ -1,0 +1,6 @@
+uid,first_name,last_name,degree_program,gpa,email
+UID00000001,Alex,Rivera,MS in Business Analytics,3.75,alex.rivera@example.com
+UID00000002,Jamie,Chen,MS in Marketing,3.50,jamie.chen@example.com
+UID00000003,Morgan,Patel,MS in Finance,3.82,morgan.patel@example.com
+UID00000004,Jordan,Kim,MS in Accounting,3.40,jordan.kim@example.com
+UID00000005,Casey,Nguyen,MS in Management,3.65,casey.nguyen@example.com
