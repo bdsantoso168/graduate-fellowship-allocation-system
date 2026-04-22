@@ -1,4 +1,4 @@
-# database/
+# database
 
 MySQL schema for the staffing allocation system.
 
