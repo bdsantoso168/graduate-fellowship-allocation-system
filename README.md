@@ -1,135 +1,173 @@
-# Staffing Allocation System — GUI Layer
-
-A NiceGUI-based admin interface for an AI-powered staffing allocation system,
-built as part of a semester consulting project. The system matches applicants
-to business units by analyzing resumes, skills, and degree programs using
-NLP (spaCy + BERT) and a weighted scoring algorithm.
-
-This repository contains **my individual contribution**: the frontend GUI layer
-(`staffing_app.py`). The broader project includes a matching pipeline, database
-layer, and user documentation built collaboratively by the team.
+# Graduate Fellowship Allocation System - Staffing Allocation System
+**Consulting Practicum**
 
 ![Graduate Fellowship Allocation System thumbnail](https://github.com/user-attachments/assets/d3d82c4d-6ee9-4c84-9763-8c85a7ae1fc9)
 
----
-
-## Screenshots
-
-> Add screenshots of the running app here after setup.
+An NLP-driven, automated matching system that places graduate students into fellowship departments based on resume skills, work experience, and academic standing. Built as a faculty-supervised consulting engagement over a 14-week sprint.
 
 ---
 
-## Features
+## What This System Does
 
-| Page | What it does |
+The existing fellowship allocation process required 40–50 hours of manual administrative labor per cycle, with match accuracy hovering around 50–60% due to inconsistent resume formats and subjective reviewer judgment.
+
+This system replaces that process with a four-module Python pipeline that reads resumes, extracts skills using NLP, scores each student against every active department using a weighted formula, and places students via a capacity-aware 4-phase draft.
+
+```
+Score = 0.40 × dept_skill_match
+      + 0.30 × common_skill_match
+      + 0.25 × work_experience
+      + 0.05 × GPA
+```
+
+---
+
+## System Architecture
+
+```
+src/
+  matching/
+    loader.py       — Resume ingestion, OCR fallback, text sanitization
+    processor.py    — SkillNer extraction, SBERT embeddings, BM25 ranking
+    matcher.py      — Score matrix + 4-phase department placement
+  database/
+    crud.py         — MySQL read/write operations for all system tables
+  utils/
+    filename_parser.py  — UID extraction from resume filenames
+nicegui_app.py          — Admin dashboard (NiceGUI web UI)
+requirements.txt        — All Python dependencies
+data/                   — Temporary upload storage (not tracked)
+```
+
+The matching engine runs entirely in Python. The NiceGUI frontend provides a browser-based admin interface for uploading rosters, configuring departments, running the matching process, and exporting results to CSV or Excel.
+
+---
+
+## Matching Pipeline
+
+```
+Student Roster (Excel / CSV)  +  Resume Files (PDF, DOCX, Image)
+                  |
+          [ loader.py ]
+          Parses and cleans raw resume text.
+          OCR fallback via Tesseract for image-based PDFs.
+                  |
+          [ processor.py ]
+          Dual-stream skill extraction:
+            Stream 1 — SkillNer hard skills (dictionary-based)
+            Stream 2 — PhraseMatcher soft skills (common skills DB)
+            Stream 3 — spaCy noun chunks (safety net)
+          SBERT deduplication → semantic validation → BM25 ranking
+                  |
+          [ matcher.py ]
+          Computes student × department score matrix.
+          Runs 4-phase capacity-aware placement draft.
+                  |
+          [ crud.py ]
+          Persists matched results to MySQL.
+          Serves data to NiceGUI results dashboard.
+```
+
+---
+
+## 4-Phase Placement
+
+| Phase | Name | Who Gets Placed |
+|---|---|---|
+| 1 | Specialist Priority | Students with domain-specific anchor skills; 1.5x score boost |
+| 2 | Generalist Draft | Remaining students placed into broader-scope departments |
+| 3 | Open Fill | Any student still unassigned to any department with capacity |
+| 4 | Strict Fallback | Guarantees every valid student is placed; expands caps in-memory only |
+
+Each department has a configurable student cap (default: 3). Specialist departments require at least one anchor skill — without it, the score is forced to zero (protection kill-switch).
+
+---
+
+## Performance Results
+
+These metrics reflect a live run on a real student cohort:
+
+| Metric | Result |
 |---|---|
-| **Welcome** | Landing page with 4-step workflow overview |
-| **Upload Data** | Upload applicant roster CSV/Excel + resume ZIP; live counters update on upload |
-| **Common Skills** | Manage the shared skill pool (~30% of matching score) with an explanatory banner |
-| **Manage Departments** | Card-based interface to add, edit, and remove departments |
-| **Matching Result** | Run the engine, watch a live stopwatch, view results table, export CSV/Excel |
-
-Additional details:
-- Live upload counters showing applicants detected and resumes extracted in real time
-- Live elapsed stopwatch during the matching run
-- Resume viewer button per row — opens PDF directly in a new tab for match verification
-- Organization brand colors applied throughout (configurable via constants)
-- Dark sidebar navigation with gold hover highlight
+| Match Accuracy | 60% |
+| Top-5 Placement Rate | 55.5% |
+| Students Placed | 70+ |
+| Departments Active | 19 |
+| Total Slots | 57 (19 × 3) |
+| Students via Fallback | ~16 |
+| Processing Time | 4–6 minutes end-to-end |
 
 ---
 
-## Tech Stack
+## Technology Stack
 
 | Layer | Technology |
 |---|---|
-| UI framework | NiceGUI (Python reactive web UI) |
-| Data handling | Pandas |
-| Database | MySQL via custom CRUD layer |
-| NLP pipeline | spaCy + BERT + OCR (subprocess) |
-| Language | Python 3.10+ |
+| Language | Python 3.11 |
+| NLP Engine | spaCy (`en_core_web_md`) + SkillNer |
+| Skill Embeddings | Sentence-BERT (`all-MiniLM-L6-v2`) |
+| Lexical Matching | BM25 (`rank-bm25`) |
+| OCR | Tesseract + Poppler via `pytesseract` / `pdf2image` |
+| Database | MySQL via `mysql-connector-python` |
+| Frontend | NiceGUI (Python-based web UI) |
+| Resume Parsing | PyPDF2, python-docx, Pillow |
+| Data I/O | pandas (Excel/CSV roster loading and export) |
 
 ---
 
-## Design Decisions
+## Repository Structure
 
-This interface was iteratively improved through team leader code reviews and professor
-feedback sessions. Key decisions and their rationale are documented inline in the code
-using `[TEAM-LEADER]` and `[PROF-REVIEW]` tags.
+This repository is used for documentation, sanitized code artifacts, and portfolio-level explanation of the system. Live development, real data, and system execution occur within a secure university VPN environment.
 
-| Decision | Rationale |
+```
+graduate-fellowship-allocation-system/
+├── src/
+│   ├── matching/
+│   │   ├── README.md           — Matching engine deep-dive
+│   │   ├── loader.py           — Resume ingestion and sanitization
+│   │   ├── processor.py        — Skill extraction and scoring
+│   │   └── matcher.py          — Placement engine
+│   └── database/
+│       └── crud.py             — Database operations
+├── docs/
+│   ├── system/
+│   │   └── overview.md         — Architecture and design documentation
+│   └── development-setup/
+│       └── README.md           — Environment setup rationale
+├── resume-matching-benchmark/  — Deprecated: earlier rule-based benchmark
+├── resume-classification-framework/ — Manual classification decision table
+├── .gitignore
+└── README.md
+```
+
+**No real student data, credentials, or internal configuration files are stored in this repository.**
+
+---
+
+## Security and Data Constraints
+
+All live system execution takes place within a secure, university-managed VPN environment. The following constraints apply across the entire project:
+
+- Student IDs, GPA, and resume content are never committed to this repository
+- Department names and internal organizational references are anonymized in all public artifacts
+- MySQL credentials and server configuration are managed externally via environment variables
+- The system must be run from a local, non-cloud-synced directory (OneDrive sync causes runtime errors)
+
+---
+
+## Engagement Timeline
+
+| Period | Focus |
 |---|---|
-| Sidebar navigation over top tabs | Team leader feedback — reduces cognitive load |
-| Live upload counters (stat cards) | Praised as clearer than a plain text status label |
-| Common Skills explanatory banner | Professor noted end users confused common vs. department skills |
-| Live elapsed stopwatch | Team leader request — processing time varies by hardware (30 s GPU vs. 2-3 min CPU) |
-| Card-based department layout | Makes department profiles scannable at a glance |
-| Resume viewer (open in new tab) | Strongly endorsed by professor for verifying individual match decisions |
-| "Confirm" instead of "Next" | Makes step progression feel deliberate; discussed in team review |
+| January–February | Environment setup, pipeline architecture, initial extraction validation |
+| February–March | Matching algorithm development, hybrid scoring, GUI pivot to NiceGUI |
+| March–April | Skill pipeline refinement, GUI stabilization, manual benchmark validation |
+| April–May | Documentation, server deployment prep, final demonstration |
+
+**Status: Consulting engagement complete. Final demonstration delivered May 2026.**
 
 ---
 
-## Setup
+## Disclaimer
 
-### Prerequisites
-- Python 3.10+
-- MySQL (or SQLite for local testing)
-- The full project pipeline in `src/` (not included — this repo contains the GUI layer only)
-
-### Install dependencies
-```bash
-pip install nicegui pandas openpyxl
-```
-
-### Add organization logo
-Place your organization logo PNG at `static/logo.png`. The file is excluded from this
-repository — add your own before running.
-
-### Run
-```bash
-python staffing_app.py
-```
-Then open `http://127.0.0.1:8080`.
-
-### Sample data
-See `sample_data/` for a fictional roster CSV you can use to test the upload flow
-without any real applicant records.
-
----
-
-## Repository structure
-
-```
-.
-├── staffing_app.py          Main GUI application
-├── sample_data/
-│   ├── sample_roster.csv       Fictional demo data — safe to share
-│   └── README.md               Required CSV column specification
-├── static/
-│   └── logo.png                (Not included) Place organization logo here
-├── src/                        (Not included) NLP pipeline and database layer
-│   ├── main.py                 Matching subprocess entry point
-│   ├── database/
-│   │   └── crud.py             Database read/write functions
-│   └── utils/
-│       └── filename_parser.py
-├── README.md
-└── .gitignore
-```
-
----
-
-## Privacy and data safety
-
-- **No real applicant records are included.** The `data/` folder is excluded by `.gitignore`.
-- **No resume files are included.** All PDF/DOCX files are excluded by `.gitignore`.
-- **No credentials are hardcoded.** Database connections are configured in `src/database/crud.py`
-  which is not part of this repository.
-- **Brand assets** are parameterized as constants (`ORG_BLUE`, `ORG_GOLD`) and
-  the logo file is excluded from the repository.
-
----
-
-## Acknowledgements
-
-Built during a graduate consulting course project. Iterative feedback from team leader
-code reviews and professor-led design sessions shaped the final interface.
+This repository is for documentation and portfolio purposes only. All sensitive implementation details, real student data, and institutional configurations remain within approved institutional systems.
